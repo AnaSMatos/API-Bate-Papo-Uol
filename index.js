@@ -104,22 +104,18 @@ app.post("/messages", async(req, res)=>{
         })
 
         if(!userOnline && to != "Todos"){
-            return console.log("nao esta online")
+            return res.sendStatus(422)
         }
 
         if(!validation.error){
-            console.log(message)
             await db.collection("messages").insertOne(message);
-            console.log("msg enviada")
             res.sendStatus(201)
-        }else{
-            console.log(validation.error)
-            res.send("validação falhou")
+        }else{   
+            res.sendStatus(422)
         }
 
     }catch{
-        console.log("catch")
-        res.send("catch")
+        res.sendStatus(422)
     }
 })
 
@@ -129,7 +125,14 @@ app.get("/messages", async(req, res)=>{
 
     try{
         const allMessages = await db.collection("messages").find({}).toArray();
-        res.send(allMessages)
+        if(!limit){
+            res.send(allMessages)
+        }else{
+            const shownMessages = allMessages.filter(m => {
+                return m.to === user || m.to === "Todos" || m.from === user;
+            })
+            res.send(shownMessages)
+        }
     }catch{
         res.sendStatus(404)
     }
