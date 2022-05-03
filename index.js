@@ -129,9 +129,9 @@ app.get("/messages", async(req, res)=>{
             res.send(allMessages)
         }else{
             const shownMessages = allMessages.filter(m => {
-                return m.to === user || m.to === "Todos" || m.from === user;
+                return m.to === user || m.type === "message" || m.from === user;
             })
-            res.send(shownMessages)
+            res.send(shownMessages.slice(shownMessages.length - limit, shownMessages.length))
         }
     }catch{
         res.sendStatus(404)
